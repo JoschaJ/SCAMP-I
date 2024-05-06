@@ -2,10 +2,8 @@
 
 import emcee
 import argparse
-import h5py
 import matplotlib.pyplot as plt
 import corner
-import sys
 import pandas
 
 if __name__ == '__main__':

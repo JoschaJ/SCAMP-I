@@ -5,7 +5,7 @@ import emcee
 import argparse
 import pandas
 
-from SCAMP_I.dmcorrcalc import get_old_new_DM
+from scampi.dmcorrcalc import get_old_new_DM
 
 def get_bestfit_params(flat_burned_samples, P0, nbins):
     # Get the best fit params out from the chains.
@@ -140,5 +140,5 @@ if __name__ == '__main__':
     psrinfo['DISP_DELTA'] = DM_CCval
     psrinfo['DISP_DELTA_ERROR'] = DM_CCvalstd
     psrinfo['DM_NEW'] = DMnew
-    
+
     psrinfo.to_csv("{}/{}".format(args.writedir,args.outputfilename))

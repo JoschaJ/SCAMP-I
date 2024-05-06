@@ -1,4 +1,4 @@
-#! usr/bin/env python
+#! /usr/bin/env python3
 
 import os
 import psrchive
@@ -12,11 +12,11 @@ def archive_to_ascii(archive, outpath, nchan=None, verbose=False):
         pam_comand = ['pam', '--setnchn', str(nchan), '-TDp','-e', ext+new_ext, '-u', outpath, archive]
         pam_Popen = subprocess.Popen(pam_comand, shell=False, cwd='.', stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         (stdoutdata, stderrdata) = pam_Popen.communicate()
-        
+
         inname = str(archive)+new_ext
     else:
         inname = archive
-        
+
     if verbose == True:
         print("Subprocess output:\n")
         print(stdoutdata+'\n')
@@ -27,10 +27,10 @@ def archive_to_ascii(archive, outpath, nchan=None, verbose=False):
     (stdoutdata, stderrdata) = pdv_Popen.communicate()
     if verbose == True:
         print("Ascii saved as {}\n".format(outname))
-    
+
     reduced_archive = inname
     saved_ascii = outname
-    
+
     return reduced_archive, saved_ascii
 
 def get_archive_info(archive, verbose=False):
@@ -86,7 +86,7 @@ def get_archive_info(archive, verbose=False):
        print('npol             Number of polarizations                    %s' % npol)
        print('nsubint          Number of sub-integrations                 %s' % nsubint)
        print('type             Observation type                           %s' % obs_type)
-       print('site             Telescope name                             %s' % telescope_name)     
+       print('site             Telescope name                             %s' % telescope_name)
        print('freq             Centre frequency (MHz)                     %s' % centre_frequency)
        print('bw               Bandwidth (MHz)                            %s' % bandwidth)
        print('P                Pulse period (s)                           %.10f' % pulseperiod)
@@ -105,9 +105,9 @@ def get_archive_info(archive, verbose=False):
        #print('be:name          Name of the backend instrument             %s' % backend_name)
        #print('be:delay         Backend propn delay from digi. input.      %s\n' % backend_delay)
        print('\n')
-    
+
    dict={'PSR':source_name, "PERIOD": pulseperiod,"NBIN":nbin,"DM_ORIG":DM,"NCHAN":nchan,"FREQ":freqs}
-    
+
    return dict
 
 def write_config(datadir, archive, outpath, outfile=None, verbose=False):
@@ -116,13 +116,13 @@ def write_config(datadir, archive, outpath, outfile=None, verbose=False):
         verbtag = True
     else:
         verbtag = False
-    
+
     os.chdir(datadir)
-    
+
     header = "PSRJ,DATAREADDIR,DATAFILENAME,PERIOD,NBIN,DM_ORIG,CHAN,FREQ"
     nr_head = len(header.split(","))
     write_ls = ['%s'] * nr_head
-    
+
     d = get_archive_info(archive, verbose=verbtag)
     nchan = d['NCHAN']
     if outfile is not None:
@@ -137,7 +137,7 @@ def write_config(datadir, archive, outpath, outfile=None, verbose=False):
             f.write(",".join(write_ls) %(d['PSR'],datadir,archive+'.ascii',d['PERIOD'],d['NBIN'],d['DM_ORIG'],i, d['FREQ'][i]))
             f.write("\n")
         f.close()
-    
+
     if verbtag == True:
         print("Config file saved as %s\n" %outfile)
 
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     parser.add_argument('-f','--filename', type=str, help="Required. Provide the filename of the archive data file", required=True)
     parser.add_argument('-d','--dir', type=str, help="Required. Provide the pathway to where the archive data files are", required=True)
     parser.add_argument('-nch','--nchan', type=int, default=4, help="Number of channels across profile to fit scattering values to (default: 4).", required=False)
-    parser.add_argument('-w', '--writedir', type=str ,help="Write directory to store channelised archive, corresponding ascii output and config file (default: cwd).", required=False) 
+    parser.add_argument('-w', '--writedir', type=str ,help="Write directory to store channelised archive, corresponding ascii output and config file (default: cwd).", required=False)
     parser.add_argument('-v', dest='verbose', action="store_true", help='verbose output', required=False)
 
     args = parser.parse_args()
@@ -160,10 +160,10 @@ if __name__ == '__main__':
     else:
         writedir = os.getcwd()
 
-    print("Writing to directory %s\n" %writedir ) 
+    print("Writing to directory %s\n" %writedir )
 
     os.chdir(args.dir)
-    
+
     reduced_ar, ascii_file = archive_to_ascii(args.filename,outpath=writedir,nchan=args.nchan,verbose=verbtag)
     write_config(writedir,reduced_ar,outpath=writedir,verbose=verbtag)
 

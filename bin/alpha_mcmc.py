@@ -1,9 +1,10 @@
-#!/bin/python
+#! /usr/bin/env python3
 
 import pandas
 import numpy as np
 import emcee
 import argparse
+
 from scipy.optimize import minimize
 
 def powerlaw(x, A, alpha):

@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-import numpy as np
 import argparse
 import pandas
 
@@ -40,4 +39,4 @@ if __name__ == '__main__':
             pass
     # Write to new file.
     psrinfo.to_csv("{}/{}".format(args.writedir,args.output_log))
-    
+

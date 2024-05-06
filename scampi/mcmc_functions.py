@@ -4,7 +4,7 @@ import numpy as np
 import emcee
 import os
 
-from SCAMP_I.model_functions import GxETrain, GxETrain1D, find_rms
+from scampi.model_functions import GxETrain, GxETrain1D, find_rms
 
 def log_likelihood(theta, x, y, yerr, nbins, modelfn):
     sigma, mu, A, tau, dc = theta

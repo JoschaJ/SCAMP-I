@@ -6,6 +6,7 @@ import h5py
 import matplotlib.pyplot as plt
 import corner
 import pandas
+
 plt.rcParams["font.family"] = "serif"
 plt.rcParams["font.size"] = "14"
 

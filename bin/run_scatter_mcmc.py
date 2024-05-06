@@ -7,9 +7,8 @@ matplotlib.use('Agg')
 import pandas
 import os
 
-
-from SCAMP_I.data_handling import read_headerfull, read_data
-from SCAMP_I.mcmc_functions import tau_fitter_mcmc
+from scampi.data_handling import read_headerfull, read_data
+from scampi.mcmc_functions import tau_fitter_mcmc
 
 if __name__ == '__main__':
     # Define options to the script.

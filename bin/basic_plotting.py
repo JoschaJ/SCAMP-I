@@ -1,4 +1,4 @@
-#!/bin/python
+#! /usr/bin/env python3
 
 import argparse
 import numpy as np
@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import pandas
 import math
 
-from SCAMP_I.data_handling import read_data, read_headerfull
-from SCAMP_I.model_functions import GxETrain, GxETrain1D
+from scampi.data_handling import read_data
+from scampi.model_functions import GxETrain, GxETrain1D
 
 
 def plot_tausigspectrum(freqGHz, tausec, tauserrsec, sigma, sigma_error, alphaMC, alphaerrMC, ampMC):
@@ -66,7 +66,7 @@ def create_profile_plots(meth, npch, taussec_highsnr, profilexaxis, data_highsnr
                 tau_ndp = int(-math.floor(math.log10(abs(taulabelerr[j+i]))))
                 if tau_ndp < 0:
                     tau_ndp = 0
-                plt.plot(profilexaxis,model_highsnr[j+i]/max(model_highsnr[j+i]),lw = 2.0, label=r'$\tau: {:.{}f} \pm{:.{}f}$ {}'.format(taulabel[j+i], tau_ndp, taulabelerr[j+i], tau_ndp, taustring), color='k') #alpha = 0.85, 
+                plt.plot(profilexaxis,model_highsnr[j+i]/max(model_highsnr[j+i]),lw = 2.0, label=r'$\tau: {:.{}f} \pm{:.{}f}$ {}'.format(taulabel[j+i], tau_ndp, taulabelerr[j+i], tau_ndp, taustring), color='k') #alpha = 0.85,
                 plt.ylim(ymin=-0.5+np.min(data_highsnr[j+i]/max(model_highsnr[j+i])), ymax=1.1*np.max(data_highsnr[j+i]/max(model_highsnr[j+i])))
                 plt.legend(fontsize=14,numpoints=1)
             #plt.ylim(ymin=-0.8, ymax=1.1*np.max(data_highsnr[j+i]/max(model_highsnr[j+i])))
@@ -74,7 +74,7 @@ def create_profile_plots(meth, npch, taussec_highsnr, profilexaxis, data_highsnr
             x1, x2 = plt.xlim()
             y1, y2 = plt.ylim()
             plt.text(0.95*x2,0.9*y2,'{:.2f} GHz'.format(freqGHz[j+i]), fontsize=15, horizontalalignment="right", verticalalignment="top")
-            if i == 6 or i == 7:            
+            if i == 6 or i == 7:
                 if pulseperiod < 1:
                     #plt.xlim(xmin=0,xmax=pulseperiod*1000)
                     plt.xlabel('Time (ms)',fontsize=15)
@@ -174,4 +174,4 @@ if __name__ == '__main__':
     plt.ticklabel_format(style='sci', axis='x',scilimits=(0,0))
     plt.legend(fontsize = 10, loc='best')
     plt.tight_layout()
-    plt.savefig('{}/{}_deltaDM.png'.format(writedir, samplesbasename))        
+    plt.savefig('{}/{}_deltaDM.png'.format(writedir, samplesbasename))
