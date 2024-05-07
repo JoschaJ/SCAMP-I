@@ -54,7 +54,7 @@ def read_data(filepath, readdir, profilenumber, nbins):
     return np.array(datalist), freqc, freqm
 
 
-def array_to_SCAMPI(data, nchans, foff, fch1, dm=0., name="some_source", rms=1., file_path=""):
+def array_to_SCAMPI(data, nchans, foff, fch1, tsamp, dm=0., name="some_source", rms=1., file_path=""):
     """Save an arraylike, coming from a filter bank in the awkward format of SCAMP-I.
 
     It does not actually require to be a filter bank but might work with fits etc.
@@ -64,6 +64,7 @@ def array_to_SCAMPI(data, nchans, foff, fch1, dm=0., name="some_source", rms=1.,
         nchans (int): Number of channels of the original filterbank.
         foff (float): Channel width in MHz.
         fch1 (float): Frequency of the lowest channel.
+        tsamp (float): Sampling time in seconds
         dm (float): Dispersion measure at which the data is dedispersed.
         name (str): Name of the source.
         rms (float): Root-mean-square or standard deviation of the offpulse data.
@@ -83,7 +84,7 @@ def array_to_SCAMPI(data, nchans, foff, fch1, dm=0., name="some_source", rms=1.,
 
     # Write config that SCAMP-I needs too.
     head = '"PSRJ","DATAREADDIR","DATAFILENAME","PERIOD","NBIN","DM_ORIG","CHAN","FREQ"\n'
-    sub_conf = [f'"{name}",".","{name}.ascii",1.0,{nsamps},{dm},{i},{freq_centers[i]}\n' for i in range(n_subbs)]
+    sub_conf = [f'"{name}",".","{name}.ascii",{tsamp*nsamps},{nsamps},{dm},{i},{freq_centers[i]}\n' for i in range(n_subbs)]
 
     with open(os.path.join(file_path, name+'_config.csv'), 'w') as f:
         f.write(head)

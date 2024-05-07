@@ -7,8 +7,8 @@ import argparse
 
 from scipy.optimize import minimize
 
-def powerlaw(x, A, alpha):
-    return A*x**(-1*alpha)
+def powerlaw(x, A, alpha, x0=1.):
+    return A*(x/x0)**(-1*alpha)
 
 def log_prior(theta):
     A, alpha = theta
@@ -18,7 +18,7 @@ def log_prior(theta):
 
 def log_likelihood(theta, x, y, yerr):
     A, alpha = theta
-    model = powerlaw(x, A, alpha)
+    model = powerlaw(x, A, alpha, x0=np.mean(x))
     return -0.5*np.sum((y-model)**2/yerr**2)
 
 def log_probability(theta, x, y, yerr):
