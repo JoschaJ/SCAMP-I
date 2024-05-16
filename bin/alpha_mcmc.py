@@ -54,7 +54,7 @@ if __name__ == '__main__':
     freq = freq[~np.isnan(tau)]
     tau = tau[~np.isnan(tau)]
     # Calculate alpha from taus and freqs by linalg.
-    x = np.log10(freq)
+    x = np.log10(freq/np.mean(freq))
     y = np.log10(tau)
     yerr = tau_error/tau
     A = np.vander(x, 2)
