@@ -7,25 +7,7 @@ import argparse
 
 from scipy.optimize import minimize
 
-def powerlaw(x, A, alpha, x0=1.):
-    return A*(x/x0)**(-1*alpha)
-
-def log_prior(theta):
-    A, alpha = theta
-    if 0. < A < np.inf and 0. < alpha < np.inf:
-        return 0.0
-    return -np.inf
-
-def log_likelihood(theta, x, y, yerr):
-    A, alpha = theta
-    model = powerlaw(x, A, alpha, x0=np.mean(x))
-    return -0.5*np.sum((y-model)**2/yerr**2)
-
-def log_probability(theta, x, y, yerr):
-    lp = log_prior(theta)
-    if not np.isfinite(lp):
-        return -np.inf
-    return lp + log_likelihood(theta, x, y, yerr)
+from scampi.pl_likelihoods import log_likelihood, log_probability
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -49,12 +31,13 @@ if __name__ == '__main__':
     tau_error = df.TAU_ERROR.values
     freq = df.FREQ.values
     sigma = df.SIGMA.values
+    reference_freq = np.mean(freq)
     # Remove nans for fitting purposes.
     tau_error = tau_error[~np.isnan(tau)]
     freq = freq[~np.isnan(tau)]
     tau = tau[~np.isnan(tau)]
     # Calculate alpha from taus and freqs by linalg.
-    x = np.log10(freq/np.mean(freq))
+    x = np.log10(freq/reference_freq)
     y = np.log10(tau)
     yerr = tau_error/tau
     A = np.vander(x, 2)
@@ -82,7 +65,7 @@ if __name__ == '__main__':
     print('psrname: {}, nwalkers: {}, runtime: {}'.format(psrname, nwalkers, runtime))
     backend = emcee.backends.HDFBackend("{}/{}".format(sampleswritedir, filename))
     backend.reset(nwalkers, ndim)
-    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, args=(freq, tau, tau_error), backend=backend)
+    sampler = emcee.EnsembleSampler(nwalkers, ndim, log_probability, args=(freq, tau, tau_error, reference_freq), backend=backend)
     max_n = runtime
     # We'll track how the average autocorrelation time estimate changes
     index = 0
@@ -108,6 +91,7 @@ if __name__ == '__main__':
         old_autocorrtime = autocorrtime
     df["ALPHASAMPLESREADDIR"] = sampleswritedir
     df["ALPHASAMPLESFILENAME"] = filename
+    df["PL_REFERENCEFREQ"] = reference_freq
     # Save.
     df.to_csv("{}/{}".format(resultswritedir,outputfilename))
 

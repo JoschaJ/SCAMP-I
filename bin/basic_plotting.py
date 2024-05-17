@@ -8,10 +8,10 @@ import math
 
 from scampi.data_handling import read_data
 from scampi.model_functions import GxETrain, GxETrain1D
-from .alpha_mcmc import powerlaw
+from scampi.pl_likelihoods import powerlaw
 
 
-def plot_tausigspectrum(freqGHz, tausec, tauserrsec, sigma, sigma_error, alphaMC, alphaerrMC, ampMC):
+def plot_tausigspectrum(freqGHz, tausec, tauserrsec, sigma, sigma_error, alphaMC, alphaerrMC, ampMC, reference_freq):
     # Convert to ms.
     taus = np.array(tausec)*1000
     tauserr = np.array(tauserrsec)*1000
@@ -24,7 +24,7 @@ def plot_tausigspectrum(freqGHz, tausec, tauserrsec, sigma, sigma_error, alphaMC
     alpha_ndp = int(-math.floor(math.log10(abs(alphaerr_MC))))
     if alpha_ndp < 0:
         alpha_ndp = 0
-    plt.plot(freqGHz, powerlaw(freqGHz*1000, 1000*ampMC, alphaMC, np.mean(freqGHz*1000)),color='k',linewidth=1.5,label=r'$\alpha = {:.{}f} \pm {:.{}f}$'.format(alphaMC, alpha_ndp, alphaerrMC, alpha_ndp))
+    plt.plot(freqGHz, powerlaw(freqGHz*1000, 1000*ampMC, alphaMC, reference_freq),color='k',linewidth=1.5,label=r'$\alpha = {:.{}f} \pm {:.{}f}$'.format(alphaMC, alpha_ndp, alphaerrMC, alpha_ndp))
     plt.xscale('log')
     plt.yscale('log')
     plt.xlabel(r'Frequency (GHz)',fontsize=22, labelpad=15.0)
@@ -120,6 +120,7 @@ if __name__ == '__main__':
     alpha_MC = psrinfo.ALPHA_MCMC.values[0]
     alphaerr_MC = psrinfo.ALPHA_ERROR_MCMC.values[0]
     amp_MC = psrinfo.AMP_MCMC.values[0]
+    reference_freq_GHz = psrinfo.PL_REFERENCEFREQ.values[0] / 1000
     method = psrinfo.METHOD.values[0]
     P0 = psrinfo.PERIOD.values[0]
     nchans = psrinfo.shape[0]
@@ -157,7 +158,7 @@ if __name__ == '__main__':
     create_profile_plots(method, nchans, tau, profilexaxis[:], data_array[:,:], model_array[:,:], P0, tauerr, psrname, freqGHz, proffilename)
 
 
-    plot_tausigspectrum(freqGHz, tau, tauerr, sigma, sigma_error, alpha_MC, alphaerr_MC, amp_MC)
+    plot_tausigspectrum(freqGHz, tau, tauerr, sigma, sigma_error, alpha_MC, alphaerr_MC, amp_MC, reference_freq_GHz)
     plt.savefig('{}/{}_tausig.png'.format(writedir, samplesbasename))
 
     # Plot DM fit.
