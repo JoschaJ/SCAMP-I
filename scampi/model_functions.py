@@ -4,7 +4,7 @@ import numpy as np
 
 
 def find_rms(data,nbins):
-    windowsize = 32 
+    windowsize = 32
     windows = int(nbins/windowsize)
     rms_loc = np.zeros(windows)
     for i in range(windows):
@@ -28,7 +28,7 @@ def makeprofile(nbins = 2**9, ncomps = 1, amps = 1, means = 100, sigmas = 10):
 
     for i in range(ncomps):
         profile = profile + \
-        npamps[i]*np.exp(-pow(x-npmeans[i],2)/(2*pow(npsigmas[i],2)))
+        npamps[i]/npsigmas[i]*np.exp(-pow(x-npmeans[i],2)/(2*pow(npsigmas[i],2)))
     return x, profile
 
 def pulsetrain(npulses = 10, bins = np.linspace(1,512,512), profile = np.zeros(512)):
@@ -67,7 +67,7 @@ def psrscatter_noconserve(brfunc, profile):
     bins = profile.shape[0]
     out = scattered[0:bins]
     return out
-    
+
 def step(x):
     return 1 * (x >= 0)
 
@@ -75,7 +75,7 @@ def broadfunc(x,tau):
     # 1. Isotropic scattering
     tau = float(tau)
     broadfunc = (1/tau)*np.exp(-x/tau)*step(x)
-    return broadfunc   
+    return broadfunc
 
 def broadfunc1D(x,tau):
     # 2. Extremely anisotropic scattering
@@ -109,7 +109,7 @@ def GxETrain(x,mu,sigma, A, tau, dc, nbins):
     scat = psrscatter_noconserve(broadfunc(binstau,tau),pulsetrain_bins(npulses, nbins, profile))
     climb, observed_nonoise, rec, flux = extractpulse(scat, 2, nbins)
     return observed_nonoise + dc
-    
+
 def GxETrain1D(x,mu, sigma, A, tau1, dc, nbins):
     mu, sigma, A, tau1 = float(mu),float(sigma), float(A), float(tau1)
     bins, profile = makeprofile(nbins = nbins, ncomps = 1, amps = A, means = mu, sigmas = sigma)
@@ -118,4 +118,4 @@ def GxETrain1D(x,mu, sigma, A, tau1, dc, nbins):
     scat = psrscatter(broadfunc1D(binstau,tau1),pulsetrain(npulses, bins, profile))
     climb, observed_nonoise, rec,flux = extractpulse(scat, 2, nbins)
     return observed_nonoise + dc
-    
+
