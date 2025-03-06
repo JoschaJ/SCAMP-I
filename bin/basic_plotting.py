@@ -11,7 +11,7 @@ from scampi.model_functions import GxETrain, GxETrain1D
 from scampi.pl_likelihoods import powerlaw
 
 
-def plot_tausigspectrum(freqGHz, tausec, tauserrsec, sigma, sigma_error, alphaMC, alphaerrMC, ampMC, reference_freq):
+def plot_tausigspectrum(freqGHz, tausec, tauserrsec, sigma, sigma_error, alphaMC, alphaerrMC, ampMC, reference_freq_GHz):
     # Convert to ms.
     taus = np.array(tausec)*1000
     tauserr = np.array(tauserrsec)*1000
@@ -24,7 +24,7 @@ def plot_tausigspectrum(freqGHz, tausec, tauserrsec, sigma, sigma_error, alphaMC
     alpha_ndp = int(-math.floor(math.log10(abs(alphaerr_MC))))
     if alpha_ndp < 0:
         alpha_ndp = 0
-    plt.plot(freqGHz, powerlaw(freqGHz*1000, 1000*ampMC, alphaMC, reference_freq),color='k',linewidth=1.5,label=r'$\alpha = {:.{}f} \pm {:.{}f}$'.format(alphaMC, alpha_ndp, alphaerrMC, alpha_ndp))
+    plt.plot(freqGHz, powerlaw(freqGHz, 1000*ampMC, alphaMC, reference_freq_GHz),color='k',linewidth=1.5,label=r'$\alpha = {:.{}f} \pm {:.{}f}$'.format(alphaMC, alpha_ndp, alphaerrMC, alpha_ndp))
     plt.xscale('log')
     plt.yscale('log')
     plt.xlabel(r'Frequency (GHz)',fontsize=22, labelpad=15.0)

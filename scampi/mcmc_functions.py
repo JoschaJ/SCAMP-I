@@ -4,6 +4,7 @@ import numpy as np
 import emcee
 import os
 
+from scipy.optimize import curve_fit
 from scampi.model_functions import GxETrain, GxETrain1D, find_rms
 
 def log_likelihood(theta, x, y, yerr, nbins, modelfn):
@@ -32,16 +33,17 @@ def log_probability(theta, x, y, yerr, nbins, modelfn):
 
 def FWHM(Y):
     half_max = max(Y) / 2.
-    firsthalf = Y[:np.argmax(Y)]
-    secondhalf = Y[np.argmax(Y):]
+    binpeak = np.argmax(Y)
+    firsthalf = Y[:binpeak]
+    secondhalf = Y[binpeak:]
     if max(firsthalf) > half_max:
         left = np.argwhere(firsthalf > half_max)[0][0]
     else:
-        left = np.argmax(firsthalf)
+        left = binpeak-2  # np.argmax(firsthalf)
     if max(secondhalf) > half_max:
-        right = np.argwhere(secondhalf > half_max)[-1][0] + np.argmax(Y)
+        right = np.argwhere(secondhalf > half_max)[-1][0] + binpeak
     else:
-        right = np.argmax(secondhalf)
+        right = binpeak + 2  # np.argmax(secondhalf)
     fwhm = right - left
     return fwhm
 
@@ -55,16 +57,23 @@ def tau_fitter_mcmc(data, nbins, freqnumber, runtime, filepath, writedir='.', mo
     dataerr = find_rms(data, nbins)
     # Specify starting values for model parameters.
     startmu = binpeak
-    startA = profile_peak
     fwhm = FWHM(data)
-    if fwhm > 0 and fwhm < nbins:
-        startsigma = fwhm/2.
-        starttau = fwhm/2.
+    if fwhm > 0 and fwhm < nbins/2:
+        startsigma = fwhm/2.4
+        starttau = fwhm/2.4
     else:
         print('FWHM estimate went wrong, just using basic sigma, tau start estimates.')
-        startsigma = 15
-        starttau = 100
+        startsigma = 5
+        starttau = 50
+    startA = profile_peak*startsigma
     startdc = 0
+    # Do an initial curve fit to improve convergence of the mcmc runs.
+    if modelfn == 'iso':
+        model = lambda x, mu, sigma, A, tau, dc: GxETrain(x, mu, sigma, A, tau, dc, nbins=len(data))
+    elif modelfn == 'onedim':
+        model = lambda x, mu, sigma, A, tau, dc: GxETrain1D(x, mu, sigma, A, tau, dc, nbins=len(data))
+    fit, covmat = curve_fit(model, xax, data, p0=[startmu, startsigma, startA, starttau, startdc])
+    startmu, startsigma, startA, starttau, startdc = fit
     coords = [[startsigma, startmu, startA, starttau, startdc] + 1e-3*np.random.randn(ndim) for i in range(nwalkers)]
     # Initialize the walkers
     # Set up the backend

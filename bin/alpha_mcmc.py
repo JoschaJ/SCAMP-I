@@ -51,7 +51,7 @@ if __name__ == '__main__':
     # Now use this to do maximum likelihood.
     nll = lambda *args: -log_likelihood(*args)
     initial = np.array([amp_linalg, alpha_linalg]) + 1 * np.random.randn(2)
-    soln = minimize(nll, initial, args=(freq, tau, tau_error))
+    soln = minimize(nll, initial, args=(freq, tau, tau_error, reference_freq))
     amp_maxlik, alpha_maxlik  = soln.x
     print("max likelihood: ", alpha_maxlik)
     # Use this as starting point for MCMC.
